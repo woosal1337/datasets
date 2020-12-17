@@ -39,6 +39,7 @@ from six.moves import urllib
 import tensorflow.compat.v2 as tf
 from tensorflow_datasets.core import constants
 from tensorflow_datasets.core import file_adapters
+from tensorflow_datasets.core import units
 from tensorflow_datasets.core.utils import type_utils
 
 Tree = type_utils.Tree
@@ -329,23 +330,6 @@ def atomic_write(path, mode):
   with tf.io.gfile.GFile(tmp_path, mode) as file_:
     yield file_
   tf.io.gfile.rename(tmp_path, path, overwrite=True)
-
-
-def read_checksum_digest(
-    path: type_utils.PathLike,
-    checksum_cls=hashlib.sha256,
-) -> Tuple[str, int]:
-  """Given a hash constructor, returns checksum digest and size of file."""
-  checksum = checksum_cls()
-  size = 0
-  with tf.io.gfile.GFile(os.fspath(path), 'rb') as f:
-    while True:
-      block = f.read(io.DEFAULT_BUFFER_SIZE)
-      size += len(block)
-      if not block:
-        break
-      checksum.update(block)
-  return checksum.hexdigest(), size  # base64 digest would have been better.
 
 
 def reraise(
